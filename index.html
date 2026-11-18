@@ -1,0 +1,1874 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>《嘉義棒鳥G肉男》Chayi Stick-Bird Muscle Man</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: #12101b;
+            color: #fff;
+            overflow-x: hidden;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        /* 台灣街頭霓虹風格特效 */
+        .neon-text-yellow {
+            text-shadow: 0 0 10px #facc15, 0 0 20px #eab308, 3px 3px 0px #713f12;
+        }
+        .neon-border {
+            box-shadow: 0 0 15px rgba(250, 204, 21, 0.4), inset 0 0 10px rgba(250, 204, 21, 0.2);
+        }
+        .arcade-btn {
+            transition: all 0.12s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 6px 0 #78350f, 0 10px 15px rgba(0,0,0,0.4);
+        }
+        .arcade-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 #78350f, 0 4px 8px rgba(0,0,0,0.4);
+        }
+        .arcade-btn-blue {
+            box-shadow: 0 6px 0 #1e3a8a, 0 10px 15px rgba(0,0,0,0.4);
+        }
+        .arcade-btn-blue:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 #1e3a8a, 0 4px 8px rgba(0,0,0,0.4);
+        }
+        .arcade-btn-red {
+            box-shadow: 0 6px 0 #7f1d1d, 0 10px 15px rgba(0,0,0,0.4);
+        }
+        .arcade-btn-red:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 #7f1d1d, 0 4px 8px rgba(0,0,0,0.4);
+        }
+
+        @keyframes floatSlow {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-6px); }
+        }
+        .animate-float {
+            animation: floatSlow 2.5s ease-in-out infinite;
+        }
+
+        @keyframes shakeScreen {
+            0%, 100% { transform: translate(0, 0); }
+            20% { transform: translate(-8px, 6px); }
+            40% { transform: translate(8px, -6px); }
+            60% { transform: translate(-6px, -4px); }
+            80% { transform: translate(6px, 4px); }
+        }
+        .shake-active {
+            animation: shakeScreen 0.35s ease-in-out;
+        }
+
+        canvas {
+            image-rendering: auto;
+            display: block;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between bg-gradient-to-b from-slate-950 via-purple-950 to-slate-900">
+
+    <!-- 頂部導覽與音效控制 -->
+    <header class="w-full max-w-4xl mx-auto px-4 pt-3 pb-1 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+            <span class="text-2xl sm:text-3xl">💪🐦</span>
+            <div>
+                <h1 class="text-lg sm:text-2xl font-black tracking-wider text-yellow-400 neon-text-yellow">
+                    嘉義棒鳥G肉男
+                </h1>
+                <p class="text-[11px] text-purple-300 hidden sm:block">CHAYI STICK-BIRD MUSCLE MAN • 台味街頭迷因模擬器</p>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+            <button id="btn-sound" onclick="toggleSound()" class="px-3 py-1.5 rounded-xl bg-slate-800/90 border border-slate-600 text-xs sm:text-sm font-bold flex items-center gap-1.5 hover:bg-slate-700 transition">
+                <span id="sound-icon">🔊</span>
+                <span id="sound-text" class="hidden sm:inline">音效開啟</span>
+            </button>
+            <button onclick="resetToSetup()" class="px-3 py-1.5 rounded-xl bg-slate-800/90 border border-slate-600 text-xs sm:text-sm font-bold hover:bg-slate-700 transition">
+                🔄 重選背心
+            </button>
+        </div>
+    </header>
+
+    <!-- 主內容區 -->
+    <main class="flex-1 w-full max-w-4xl mx-auto px-3 sm:px-4 py-2 flex flex-col justify-center">
+
+        <!-- ================= 階段一：角色生成與背心選擇 ================= -->
+        <section id="screen-setup" class="bg-slate-900/90 border-2 border-yellow-500/60 rounded-3xl p-4 sm:p-6 shadow-2xl neon-border">
+            <div class="text-center mb-4">
+                <span class="inline-block px-3 py-0.5 rounded-full bg-yellow-500/20 border border-yellow-400 text-yellow-300 text-xs font-bold mb-1">
+                    STAGE 1 • 角色生成與背心選擇
+                </span>
+                <h2 class="text-xl sm:text-3xl font-black text-white">打造你的街頭「G肉男」戰袍</h2>
+                <p class="text-xs sm:text-sm text-slate-300 mt-1">挑選最純的台味背心顏色與幸運背號，準備上街轉角遇到鳥！</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-5 items-center">
+                <!-- 左側：即時動態角色預覽 Canvas -->
+                <div class="md:col-span-5 flex flex-col items-center bg-gradient-to-b from-slate-800 to-slate-950 rounded-2xl p-4 border border-slate-700 relative overflow-hidden">
+                    <div class="absolute top-2 left-3 text-[11px] font-bold text-yellow-400 bg-black/50 px-2 py-0.5 rounded-md">
+                        LIVE G肉預覽
+                    </div>
+                    <canvas id="setup-preview-canvas" width="240" height="260" class="w-48 h-52 sm:w-56 sm:h-60"></canvas>
+                    <div id="preview-badge" class="mt-1 px-3 py-1 rounded-full bg-slate-800 border border-slate-600 text-xs font-bold text-amber-300">
+                        工地亮橘 • #87號G肉男
+                    </div>
+                </div>
+
+                <!-- 右側：背心顏色與號碼設定 -->
+                <div class="md:col-span-7 space-y-4">
+                    <!-- 1. 背心顏色選擇 -->
+                    <div class="bg-slate-800/70 p-3.5 rounded-2xl border border-slate-700">
+                        <label class="block text-xs sm:text-sm font-bold text-yellow-300 mb-2">
+                            👕 選擇背心顏色 (台味街頭經典色 + 自訂色)
+                        </label>
+                        <div class="grid grid-cols-3 sm:grid-cols-6 gap-2" id="vest-color-presets">
+                            <!-- 由 JS 動態填入 -->
+                        </div>
+                        <div class="mt-3 flex items-center justify-between pt-2 border-t border-slate-700/80">
+                            <span class="text-xs text-slate-300">或是調配專屬色：</span>
+                            <div class="flex items-center gap-2">
+                                <input type="color" id="custom-vest-color" value="#ff5500" class="w-8 h-8 rounded cursor-pointer bg-transparent border-0">
+                                <span id="color-name-label" class="text-xs font-bold text-amber-400">工地亮橘</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2. 背心幸運號碼 -->
+                    <div class="bg-slate-800/70 p-3.5 rounded-2xl border border-slate-700">
+                        <label class="block text-xs sm:text-sm font-bold text-yellow-300 mb-2">
+                            🔢 背心幸運號碼 (00 ~ 99)
+                        </label>
+                        <div class="flex items-center gap-2">
+                            <input type="number" id="vest-number-input" min="0" max="99" value="87"
+                                class="w-24 text-center text-2xl font-black bg-slate-950 border-2 border-yellow-500 rounded-xl py-1.5 text-yellow-400 focus:outline-none">
+                            <button onclick="randomizeCharacter()" class="flex-1 py-2.5 px-3 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-lg transition">
+                                🎲 隨機生成背心與號碼
+                            </button>
+                        </div>
+                        <div class="flex flex-wrap gap-1.5 mt-2.5">
+                            <span class="text-[11px] text-slate-400 self-center">熱門背號：</span>
+                            <button onclick="setQuickNumber('87')" class="px-2 py-0.5 text-xs rounded bg-slate-700 hover:bg-slate-600 text-amber-300 font-bold">87 (霸氣)</button>
+                            <button onclick="setQuickNumber('69')" class="px-2 py-0.5 text-xs rounded bg-slate-700 hover:bg-slate-600 text-amber-300 font-bold">69 (順手)</button>
+                            <button onclick="setQuickNumber('99')" class="px-2 py-0.5 text-xs rounded bg-slate-700 hover:bg-slate-600 text-amber-300 font-bold">99 (長久)</button>
+                            <button onclick="setQuickNumber('00')" class="px-2 py-0.5 text-xs rounded bg-slate-700 hover:bg-slate-600 text-amber-300 font-bold">00 (無敵)</button>
+                            <button onclick="setQuickNumber('66')" class="px-2 py-0.5 text-xs rounded bg-slate-700 hover:bg-slate-600 text-amber-300 font-bold">66 (大順)</button>
+                        </div>
+                    </div>
+
+                    <!-- 3. 出發按鈕 -->
+                    <button onclick="startGame()" class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-yellow-400 via-amber-500 to-orange-500 text-slate-950 font-black text-lg sm:text-xl tracking-wide arcade-btn flex items-center justify-center gap-2">
+                        <span>穿上背心！上街棒打小鳥</span>
+                        <span class="text-2xl">🏏</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= 階段二：街頭漫遊與轉角打鳥 ================= -->
+        <section id="screen-game" class="hidden flex-col gap-3">
+            <!-- 關卡與分數狀態列 -->
+            <div class="grid grid-cols-3 gap-2 bg-slate-900/90 border border-slate-700 rounded-2xl p-2.5 sm:p-3 shadow-lg">
+                <div class="flex flex-col">
+                    <span class="text-[10px] sm:text-xs text-slate-400 font-bold">目前關卡</span>
+                    <span id="hud-level-title" class="text-xs sm:text-base font-black text-yellow-400 truncate">第1關：初級巷弄</span>
+                </div>
+                <div class="flex flex-col items-center justify-center border-x border-slate-800">
+                    <span class="text-[10px] sm:text-xs text-slate-400 font-bold">轉角進度</span>
+                    <div id="hud-corner-dots" class="flex items-center gap-1.5 mt-0.5">
+                        <!-- 進度燈號 -->
+                    </div>
+                </div>
+                <div class="flex flex-col items-end">
+                    <span class="text-[10px] sm:text-xs text-slate-400 font-bold">G肉積分</span>
+                    <span id="hud-score" class="text-sm sm:text-xl font-black text-emerald-400">0</span>
+                </div>
+            </div>
+
+            <!-- 遊戲主畫布容器 -->
+            <div id="canvas-wrapper" class="relative w-full bg-slate-950 rounded-3xl overflow-hidden border-2 border-yellow-500/70 shadow-2xl aspect-[16/10] sm:aspect-[16/9] max-h-[56vh]">
+                <canvas id="game-canvas" class="w-full h-full"></canvas>
+
+                <!-- 關卡頂部提示橫幅 -->
+                <div id="level-banner" class="absolute top-3 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-full bg-black/75 border border-yellow-500/50 text-xs sm:text-sm font-bold text-yellow-300 pointer-events-none whitespace-nowrap shadow-lg">
+                    🚶 正在街上自信漫遊中...
+                </div>
+
+                <!-- 揮棒集氣/時機條覆蓋層 (當按下拿棒子打小鳥時出現) -->
+                <div id="power-bar-modal" class="hidden absolute inset-x-4 bottom-4 sm:inset-x-12 sm:bottom-6 bg-slate-900/95 border-2 border-yellow-400 rounded-2xl p-3 sm:p-4 shadow-2xl flex-col items-center z-20">
+                    <div class="flex items-center justify-between w-full mb-1.5">
+                        <span class="text-xs sm:text-sm font-black text-yellow-300">⚡ 抓準時機揮棒！(點擊下方按鈕或空白鍵)</span>
+                        <span id="power-difficulty-tag" class="text-[11px] px-2 py-0.5 rounded bg-red-500/20 text-red-300 font-bold">鳥王閃躲中</span>
+                    </div>
+
+                    <!-- 三段判定條 -->
+                    <div class="relative w-full h-7 sm:h-8 bg-slate-800 rounded-xl overflow-hidden border-2 border-slate-600 flex">
+                        <!-- 大凶區 (左) -->
+                        <div id="zone-bad-left" class="h-full bg-rose-700/80 flex items-center justify-center text-[10px] font-bold text-rose-200" style="width: 30%;">
+                            垂頭喪氣
+                        </div>
+                        <!-- 平平區 (中左) -->
+                        <div id="zone-mid-left" class="h-full bg-sky-600/80 flex items-center justify-center text-[10px] font-bold text-sky-100" style="width: 22%;">
+                            命中街角
+                        </div>
+                        <!-- 大吉區 (黃金中央) -->
+                        <div id="zone-good" class="h-full bg-gradient-to-r from-yellow-400 via-amber-300 to-yellow-400 flex items-center justify-center text-xs font-black text-slate-950 shadow-inner" style="width: 20%;">
+                            ★高飛遠走★
+                        </div>
+                        <!-- 平平區 (中右) -->
+                        <div id="zone-mid-right" class="h-full bg-sky-600/80 flex items-center justify-center text-[10px] font-bold text-sky-100" style="width: 15%;">
+                            街角
+                        </div>
+                        <!-- 大凶區 (右) -->
+                        <div id="zone-bad-right" class="h-full bg-rose-700/80 flex items-center justify-center text-[10px] font-bold text-rose-200" style="width: 13%;">
+                            垂下
+                        </div>
+
+                        <!-- 移動游標 -->
+                        <div id="power-cursor" class="absolute top-0 bottom-0 w-2 bg-white shadow-[0_0_12px_#fff] border-x border-black" style="left: 50%;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 底部操作控制面板 -->
+            <div class="bg-slate-900/95 border border-slate-700 rounded-2xl p-3 sm:p-4 shadow-xl">
+                <!-- 狀態 A：漫遊中 -->
+                <div id="ctrl-wandering" class="flex items-center justify-between gap-3">
+                    <div class="flex items-center gap-2.5">
+                        <span class="text-2xl animate-bounce">🦵</span>
+                        <div>
+                            <div class="text-sm sm:text-base font-black text-white">G肉男正在街頭隨機遊走...</div>
+                            <div class="text-xs text-slate-400">走路自帶六親不認的步伐，即將抵達下一個轉角！</div>
+                        </div>
+                    </div>
+                    <button onclick="skipToCorner()" class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-600 text-xs sm:text-sm font-bold text-yellow-300 shrink-0">
+                        ⏩ 快步到轉角
+                    </button>
+                </div>
+
+                <!-- 狀態 B：遇到轉角，選擇打不打鳥 -->
+                <div id="ctrl-corner-choice" class="hidden flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5">
+                    <div class="flex items-center gap-2">
+                        <span class="text-2xl">🐦</span>
+                        <div>
+                            <div class="text-sm sm:text-base font-black text-yellow-300">轉角野鳥出現了！你要出手嗎？</div>
+                            <div class="text-xs text-slate-300" id="corner-desc-text">這隻小鳥正在街角電線桿下東張西望...</div>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 sm:flex gap-2.5">
+                        <button onclick="openSwingGauge()" class="py-3 px-4 rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 text-slate-950 font-black text-sm sm:text-base arcade-btn flex items-center justify-center gap-1.5">
+                            <span>🏏 拿棒子打小鳥！</span>
+                        </button>
+                        <button onclick="passCorner()" class="py-3 px-4 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm sm:text-base arcade-btn-blue flex items-center justify-center gap-1.5">
+                            <span>🚶 放過轉彎繼續走</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 狀態 C：揮棒瞬間按鈕 -->
+                <div id="ctrl-swing-now" class="hidden flex-col sm:flex-row items-center justify-between gap-2">
+                    <button onclick="executeSwingHit()" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-red-500 via-orange-500 to-yellow-400 text-slate-950 font-black text-lg sm:text-xl arcade-btn-red tracking-wider">
+                        💥 立即揮棒！(HIT!)
+                    </button>
+                    <button onclick="luckyAutoSwing()" class="w-full sm:w-auto px-4 py-3.5 rounded-xl bg-purple-700 hover:bg-purple-600 text-white font-bold text-xs sm:text-sm shrink-0">
+                        🎲 純靠天命隨機揮
+                    </button>
+                </div>
+
+                <!-- 狀態 D：揮棒結果回報 -->
+                <div id="ctrl-result" class="hidden flex-col sm:flex-row items-center justify-between gap-3">
+                    <div class="flex items-center gap-3">
+                        <span id="result-emoji" class="text-3xl sm:text-4xl">🚀</span>
+                        <div>
+                            <div id="result-title" class="text-base sm:text-lg font-black text-yellow-300">高飛遠走型（大吉）！</div>
+                            <div id="result-desc" class="text-xs sm:text-sm text-slate-300">棒子一揮，小鳥「咻——」一聲飛得又高又遠，消失在天際！</div>
+                        </div>
+                    </div>
+                    <button id="btn-next-step" onclick="proceedAfterHit()" class="w-full sm:w-auto px-6 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-sm sm:text-base arcade-btn shrink-0">
+                        繼續前進 ➔
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= 階段三：通關結算與迷因紀念卡合成 ================= -->
+        <section id="screen-victory" class="hidden bg-slate-900/95 border-2 border-yellow-400 rounded-3xl p-4 sm:p-6 shadow-2xl neon-border">
+            <div class="text-center mb-4">
+                <span class="inline-block px-3 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-400 text-emerald-300 text-xs font-bold mb-1">
+                    STAGE 3 • 三關全破！傳奇誕生
+                </span>
+                <h2 class="text-2xl sm:text-3xl font-black text-yellow-400 neon-text-yellow">
+                    🏆 街頭迷因紀念卡生成器 🏆
+                </h2>
+                <p class="text-xs sm:text-sm text-slate-300 mt-1">
+                    恭喜通過三大街頭考驗！上傳你的照片（或使用預設G肉男），寫下傳奇名言並下載紀念卡！
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                <!-- 左側：合成後的迷因紀念卡 Canvas -->
+                <div class="lg:col-span-6 flex flex-col items-center">
+                    <div class="bg-slate-950 p-2.5 rounded-2xl border-2 border-yellow-500/70 shadow-2xl w-full max-w-sm">
+                        <canvas id="meme-card-canvas" width="600" height="750" class="w-full h-auto rounded-xl"></canvas>
+                    </div>
+                    <div class="flex gap-2.5 w-full max-w-sm mt-3">
+                        <button onclick="downloadMemeCard()" class="flex-1 py-3 px-4 rounded-xl bg-gradient-to-r from-yellow-400 to-amber-500 text-slate-950 font-black text-sm sm:text-base arcade-btn flex items-center justify-center gap-1.5">
+                            <span>💾 下載迷因紀念卡 (PNG)</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 右側：自訂照片與名言設定 -->
+                <div class="lg:col-span-6 space-y-4">
+                    <!-- 1. 戰績統計 -->
+                    <div class="grid grid-cols-4 gap-2 bg-slate-800/90 p-3 rounded-2xl border border-slate-700 text-center">
+                        <div>
+                            <div class="text-[11px] text-slate-400">總積分</div>
+                            <div id="stat-total-score" class="text-base sm:text-lg font-black text-yellow-400">0</div>
+                        </div>
+                        <div>
+                            <div class="text-[11px] text-slate-400">高飛(大吉)</div>
+                            <div id="stat-tier1" class="text-base sm:text-lg font-black text-emerald-400">0次</div>
+                        </div>
+                        <div>
+                            <div class="text-[11px] text-slate-400">街角(平平)</div>
+                            <div id="stat-tier2" class="text-base sm:text-lg font-black text-sky-400">0次</div>
+                        </div>
+                        <div>
+                            <div class="text-[11px] text-slate-400">垂下(大凶)</div>
+                            <div id="stat-tier3" class="text-base sm:text-lg font-black text-rose-400">0次</div>
+                        </div>
+                    </div>
+
+                    <!-- 2. 上傳照片替換頭像或背景 -->
+                    <div class="bg-slate-800/70 p-4 rounded-2xl border border-slate-700">
+                        <label class="block text-sm font-bold text-yellow-300 mb-1.5">
+                            📸 上傳你的照片（合成至G肉男頭像框）
+                        </label>
+                        <p class="text-xs text-slate-400 mb-3">
+                            可從手機或電腦選擇一張照片，系統會自動將照片嵌入紀念卡主角頭像！
+                        </p>
+                        <div class="flex flex-wrap items-center gap-2">
+                            <label class="cursor-pointer py-2.5 px-4 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs sm:text-sm inline-flex items-center gap-1.5 shadow transition">
+                                <span>📂 選擇照片上傳</span>
+                                <input type="file" id="photo-upload-input" accept="image/*" class="hidden" onchange="handlePhotoUpload(event)">
+                            </label>
+                            <button onclick="clearUploadedPhoto()" id="btn-clear-photo" class="hidden py-2.5 px-3 rounded-xl bg-slate-700 hover:bg-slate-600 text-xs font-bold text-slate-200">
+                                ✕ 恢復預設G肉男頭像
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 3. 寫下街頭名言或套用預設「嘉義棒鳥G肉男」 -->
+                    <div class="bg-slate-800/70 p-4 rounded-2xl border border-slate-700">
+                        <label class="block text-sm font-bold text-yellow-300 mb-1.5">
+                            ✍️ 街頭傳奇名言 / 稱號
+                        </label>
+                        <input type="text" id="meme-quote-input" maxlength="22" value="嘉義棒鳥G肉男"
+                            oninput="renderMemeCard()"
+                            class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border-2 border-yellow-500 text-yellow-300 font-black text-base sm:text-lg focus:outline-none">
+
+                        <div class="mt-2.5">
+                            <span class="text-xs text-slate-400 block mb-1.5">快速套用經典台味名言：</span>
+                            <div class="flex flex-wrap gap-1.5">
+                                <button onclick="setMemeQuote('嘉義棒鳥G肉男')" class="px-2.5 py-1 rounded-lg bg-yellow-500/20 border border-yellow-400 text-yellow-300 text-xs font-bold hover:bg-yellow-500/30">
+                                    ★ 嘉義棒鳥G肉男 (預設)
+                                </button>
+                                <button onclick="setMemeQuote('轉角遇到鳥，一棒飛上天')" class="px-2.5 py-1 rounded-lg bg-slate-700 text-slate-200 text-xs font-bold hover:bg-slate-600">
+                                    轉角遇到鳥，一棒飛上天
+                                </button>
+                                <button onclick="setMemeQuote('背心穿得好，小鳥垂不了')" class="px-2.5 py-1 rounded-lg bg-slate-700 text-slate-200 text-xs font-bold hover:bg-slate-600">
+                                    背心穿得好，小鳥垂不了
+                                </button>
+                                <button onclick="setMemeQuote('火雞肉飯配大棒，嘉義最壯')" class="px-2.5 py-1 rounded-lg bg-slate-700 text-slate-200 text-xs font-bold hover:bg-slate-600">
+                                    火雞肉飯配大棒，嘉義最壯
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 4. 再玩一次 -->
+                    <button onclick="resetToSetup()" class="w-full py-3 rounded-2xl bg-slate-800 hover:bg-slate-700 border border-slate-600 text-white font-bold text-sm sm:text-base transition">
+                        🔄 換件背心再戰一輪
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- 頁尾資訊 -->
+    <footer class="w-full text-center py-2 text-[11px] text-slate-500">
+        《嘉義棒鳥G肉男》街頭迷因互動遊戲 • 支援鍵盤空白鍵揮棒與觸控操作
+    </footer>
+
+    <!-- ================= 遊戲核心邏輯腳本 ================= -->
+    <script>
+        /* ----------------------------------------------------------
+         * 1. 全域狀態與台灣街頭背心預設庫
+         * ---------------------------------------------------------- */
+        const VEST_PRESETS = [
+            { name: '工地亮橘', color: '#ff5722', textColor: '#ffffff' },
+            { name: '藍白拖藍', color: '#1d4ed8', textColor: '#ffffff' },
+            { name: '螢光綠',   color: '#84cc16', textColor: '#0f172a' },
+            { name: '阿伯吊嘎白', color: '#f8fafc', textColor: '#dc2626' },
+            { name: '檳榔攤紅', color: '#e11d48', textColor: '#fef08a' },
+            { name: '土豪純金', color: '#eab308', textColor: '#0f172a' }
+        ];
+
+        const LEVELS = [
+            {
+                id: 1,
+                name: '第 1 關：初級巷弄（巷口阿伯的日常）',
+                shortName: '第1關：初級巷弄',
+                desc: '紅磚牆與檳榔攤霓虹燈，小鳥反應較慢，容錯率高！',
+                cornersRequired: 2,
+                walkSpeed: 2.3,
+                gaugeSpeed: 1.4,
+                goodZoneWidth: 26, // 大吉區寬度%
+                midZoneWidth: 44,  // 平平區總寬度%
+                skyGrad: ['#1e1b4b', '#31102f'],
+                birdDodge: false
+            },
+            {
+                id: 2,
+                name: '第 2 關：市區十字路口（車水馬龍的考驗）',
+                shortName: '第2關：市區十字路口',
+                desc: '紅綠燈與機車陣呼嘯而過，G肉男步伐加快，抓準時機！',
+                cornersRequired: 2,
+                walkSpeed: 3.1,
+                gaugeSpeed: 2.1,
+                goodZoneWidth: 20,
+                midZoneWidth: 38,
+                skyGrad: ['#0f172a', '#1e293b'],
+                birdDodge: false
+            },
+            {
+                id: 3,
+                name: '第 3 關：嘉義神祕大道（終極鳥王挑戰）',
+                shortName: '第3關：嘉義神祕大道',
+                desc: '巨型火雞肉飯招牌照耀！終極鳥王會上下閃躲，「垂下來」機率大增！',
+                cornersRequired: 2,
+                walkSpeed: 3.6,
+                gaugeSpeed: 2.85,
+                goodZoneWidth: 16,
+                midZoneWidth: 30,
+                skyGrad: ['#2a0800', '#450a0a'],
+                birdDodge: true
+            }
+        ];
+
+        const state = {
+            soundEnabled: true,
+            vestColor: '#ff5722',
+            vestColorName: '工地亮橘',
+            vestTextColor: '#ffffff',
+            vestNumber: '87',
+
+            // 遊戲進程
+            currentLevelIdx: 0,
+            cornerIndex: 0,
+            score: 0,
+            stats: { tier1: 0, tier2: 0, tier3: 0 },
+
+            // 動畫與角色狀態: 'WANDERING' | 'AT_CORNER' | 'AIMING' | 'SWINGING' | 'RESULT'
+            phase: 'WANDERING',
+            animTick: 0,
+            playerX: 110,
+            streetScrollX: 0,
+            swingAngle: 0,
+            playerExpression: 'NORMAL', // 'NORMAL' | 'PROUD' | 'SWEAT'
+
+            // 小鳥狀態
+            bird: {
+                visible: false,
+                x: 0,
+                y: 0,
+                baseY: 0,
+                vx: 0,
+                vy: 0,
+                rotation: 0,
+                state: 'IDLE', // 'IDLE' | 'FLY_HIGH' | 'HIT_CORNER' | 'DROOP_GROUND'
+                dizzyStars: false
+            },
+
+            // 集氣條
+            gaugePos: 50,
+            gaugeDir: 1,
+            lastHitTier: null, // 1: 高飛, 2: 街角, 3: 垂下
+
+            // 浮動特效文字與粒子
+            particles: [],
+            floatingText: null,
+
+            // 背景機車陣
+            scooters: [],
+
+            // 通關上傳照片
+            uploadedPhotoImg: null
+        };
+
+        /* ----------------------------------------------------------
+         * 2. Web Audio API 合成街頭音效系統 (無需外部音檔)
+         * ---------------------------------------------------------- */
+        let audioCtx = null;
+        function ensureAudio() {
+            if (!state.soundEnabled) return null;
+            if (!audioCtx) {
+                const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+                if (AudioContextClass) audioCtx = new AudioContextClass();
+            }
+            if (audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            return audioCtx;
+        }
+
+        function toggleSound() {
+            state.soundEnabled = !state.soundEnabled;
+            document.getElementById('sound-icon').textContent = state.soundEnabled ? '🔊' : '🔇';
+            document.getElementById('sound-text').textContent = state.soundEnabled ? '音效開啟' : '靜音模式';
+            if (state.soundEnabled) playSfx('click');
+        }
+
+        function playSfx(type) {
+            const ctx = ensureAudio();
+            if (!ctx) return;
+            const now = ctx.currentTime;
+
+            if (type === 'click') {
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(520, now);
+                osc.frequency.exponentialRampToValueAtTime(780, now + 0.07);
+                gain.gain.setValueAtTime(0.15, now);
+                gain.gain.linearRampToValueAtTime(0.01, now + 0.07);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start(now);
+                osc.stop(now + 0.07);
+            } else if (type === 'corner') {
+                // 遇到小鳥啾啾聲
+                [900, 1250].forEach((freq, idx) => {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(freq, now + idx * 0.09);
+                    osc.frequency.exponentialRampToValueAtTime(freq * 1.25, now + idx * 0.09 + 0.07);
+                    gain.gain.setValueAtTime(0.16, now + idx * 0.09);
+                    gain.gain.linearRampToValueAtTime(0.01, now + idx * 0.09 + 0.08);
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.start(now + idx * 0.09);
+                    osc.stop(now + idx * 0.09 + 0.08);
+                });
+            } else if (type === 'tier1') {
+                // 高飛遠走型：強勁打擊 + 咻——飛上天音效
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(280, now);
+                osc.frequency.exponentialRampToValueAtTime(1650, now + 0.55);
+                gain.gain.setValueAtTime(0.25, now);
+                gain.gain.exponentialRampToValueAtTime(0.008, now + 0.58);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start(now);
+                osc.stop(now + 0.58);
+            } else if (type === 'tier2') {
+                // 命中街角型：撞擊電線桿鏘一聲
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(420, now);
+                osc.frequency.setValueAtTime(260, now + 0.08);
+                osc.frequency.setValueAtTime(340, now + 0.16);
+                gain.gain.setValueAtTime(0.22, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start(now);
+                osc.stop(now + 0.35);
+            } else if (type === 'tier3') {
+                // 垂頭喪氣型：軟弱無力往下滑音 (Womp womp)
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(300, now);
+                osc.frequency.linearRampToValueAtTime(110, now + 0.5);
+                gain.gain.setValueAtTime(0.22, now);
+                gain.gain.linearRampToValueAtTime(0.01, now + 0.52);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start(now);
+                osc.stop(now + 0.52);
+            } else if (type === 'fanfare') {
+                // 過關歡呼和弦
+                const notes = [523.25, 659.25, 783.99, 1046.5];
+                notes.forEach((n, i) => {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(n, now + i * 0.1);
+                    gain.gain.setValueAtTime(0.2, now + i * 0.1);
+                    gain.gain.exponentialRampToValueAtTime(0.008, now + i * 0.1 + 0.35);
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.start(now + i * 0.1);
+                    osc.stop(now + i * 0.1 + 0.35);
+                });
+            }
+        }
+
+        /* ----------------------------------------------------------
+         * 3. 階段一：角色設定與背心即時預覽
+         * ---------------------------------------------------------- */
+        function initSetupScreen() {
+            const container = document.getElementById('vest-color-presets');
+            container.innerHTML = '';
+            VEST_PRESETS.forEach((preset) => {
+                const btn = document.createElement('button');
+                btn.className = 'flex flex-col items-center p-2 rounded-xl border-2 border-slate-600 hover:border-yellow-400 transition bg-slate-900/90';
+                btn.innerHTML = `
+                    <span class="w-7 h-7 rounded-full border border-white/40 shadow mb-1" style="background-color: ${preset.color};"></span>
+                    <span class="text-[11px] font-bold text-slate-200">${preset.name}</span>
+                `;
+                btn.onclick = () => {
+                    selectVestColor(preset.color, preset.name, preset.textColor);
+                    playSfx('click');
+                };
+                container.appendChild(btn);
+            });
+
+            // 綁定自訂顏色與號碼輸入
+            document.getElementById('custom-vest-color').addEventListener('input', (e) => {
+                selectVestColor(e.target.value, '街頭自訂色', '#ffffff');
+            });
+
+            document.getElementById('vest-number-input').addEventListener('input', (e) => {
+                let val = parseInt(e.target.value, 10);
+                if (isNaN(val)) val = 0;
+                val = Math.max(0, Math.min(99, val));
+                state.vestNumber = String(val).padStart(2, '0');
+                updatePreviewBadge();
+            });
+        }
+
+        function selectVestColor(colorHex, colorName, textColor = '#ffffff') {
+            state.vestColor = colorHex;
+            state.vestColorName = colorName;
+            state.vestTextColor = textColor;
+            document.getElementById('custom-vest-color').value = colorHex;
+            document.getElementById('color-name-label').textContent = colorName;
+            updatePreviewBadge();
+        }
+
+        function setQuickNumber(numStr) {
+            state.vestNumber = numStr.padStart(2, '0');
+            document.getElementById('vest-number-input').value = parseInt(numStr, 10);
+            updatePreviewBadge();
+            playSfx('click');
+        }
+
+        function randomizeCharacter() {
+            const randomPreset = VEST_PRESETS[Math.floor(Math.random() * VEST_PRESETS.length)];
+            const randomNum = String(Math.floor(Math.random() * 100)).padStart(2, '0');
+            selectVestColor(randomPreset.color, randomPreset.name, randomPreset.textColor);
+            document.getElementById('vest-number-input').value = parseInt(randomNum, 10);
+            state.vestNumber = randomNum;
+            updatePreviewBadge();
+            playSfx('click');
+        }
+
+        function updatePreviewBadge() {
+            document.getElementById('preview-badge').textContent = `${state.vestColorName} • #${state.vestNumber}號G肉男`;
+        }
+
+        /* ----------------------------------------------------------
+         * 4. 共用繪圖函數：繪製壯碩「G肉男」與小鳥
+         * ---------------------------------------------------------- */
+        function drawMuscleMan(ctx, x, y, scale, walkTick, swingAngle, expression, customFaceImg = null) {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.scale(scale, scale);
+
+            const legSwing = Math.sin(walkTick * 0.18) * 14;
+            const bounceY = Math.abs(Math.cos(walkTick * 0.18)) * 5;
+            ctx.translate(0, -bounceY);
+
+            const skinColor = '#eab676';
+            const skinShadow = '#c68b59';
+
+            // 陰影
+            ctx.fillStyle = 'rgba(0,0,0,0.35)';
+            ctx.beginPath();
+            ctx.ellipse(0, 88 + bounceY, 42, 10, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // 後腿 (壯碩大腿 + 藍白拖)
+            ctx.save();
+            ctx.translate(-14, 38);
+            ctx.rotate((-legSwing * Math.PI) / 180);
+            ctx.fillStyle = skinShadow;
+            ctx.beginPath();
+            ctx.roundRect(-10, 0, 20, 42, 8);
+            ctx.fill();
+            // 藍白拖鞋
+            ctx.fillStyle = '#f8fafc';
+            ctx.fillRect(-12, 40, 28, 7);
+            ctx.fillStyle = '#1d4ed8';
+            ctx.fillRect(-4, 36, 14, 7);
+            ctx.restore();
+
+            // 前腿
+            ctx.save();
+            ctx.translate(14, 38);
+            ctx.rotate((legSwing * Math.PI) / 180);
+            ctx.fillStyle = skinColor;
+            ctx.beginPath();
+            ctx.roundRect(-10, 0, 20, 42, 8);
+            ctx.fill();
+            // 藍白拖鞋
+            ctx.fillStyle = '#f8fafc';
+            ctx.fillRect(-10, 40, 28, 7);
+            ctx.fillStyle = '#1d4ed8';
+            ctx.fillRect(-2, 36, 14, 7);
+            ctx.restore();
+
+            // 海灘短褲
+            ctx.fillStyle = '#1e293b';
+            ctx.beginPath();
+            ctx.roundRect(-30, 22, 60, 24, 6);
+            ctx.fill();
+            ctx.strokeStyle = '#facc15';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(-28, 24, 56, 20);
+
+            // 後方手臂 (二頭肌爆棚)
+            ctx.save();
+            ctx.translate(-38, -28);
+            ctx.fillStyle = skinShadow;
+            ctx.beginPath();
+            ctx.arc(-8, 12, 16, 0, Math.PI * 2); // 巨型二頭肌
+            ctx.fill();
+            ctx.beginPath();
+            ctx.roundRect(-18, 12, 18, 32, 8);
+            ctx.fill();
+            ctx.restore();
+
+            // 壯碩倒三角胸肌與軀幹底色
+            ctx.fillStyle = skinColor;
+            ctx.beginPath();
+            ctx.moveTo(-44, -44);
+            ctx.lineTo(44, -44);
+            ctx.lineTo(30, 26);
+            ctx.lineTo(-30, 26);
+            ctx.closePath();
+            ctx.fill();
+
+            // 吊嘎背心 (玩家自選色)
+            ctx.fillStyle = state.vestColor;
+            ctx.beginPath();
+            // 左肩帶
+            ctx.moveTo(-34, -45);
+            ctx.lineTo(-18, -45);
+            ctx.lineTo(-14, -22);
+            // 領口挖空露出胸肌溝
+            ctx.quadraticCurveTo(0, -14, 14, -22);
+            // 右肩帶
+            ctx.lineTo(18, -45);
+            ctx.lineTo(34, -45);
+            ctx.lineTo(38, -14);
+            ctx.lineTo(29, 25);
+            ctx.lineTo(-29, 25);
+            ctx.lineTo(-38, -14);
+            ctx.closePath();
+            ctx.fill();
+            ctx.strokeStyle = '#0f172a';
+            ctx.lineWidth = 2.5;
+            ctx.stroke();
+
+            // 胸肌事業線陰影
+            ctx.strokeStyle = skinShadow;
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(0, -32);
+            ctx.lineTo(0, -18);
+            ctx.stroke();
+
+            // 背心上的幸運號碼 (00 ~ 99)
+            ctx.fillStyle = state.vestTextColor;
+            ctx.font = '900 26px "Noto Sans TC", sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(state.vestNumber, 0, 4);
+
+            // 粗壯脖子與頭部
+            ctx.fillStyle = skinColor;
+            ctx.fillRect(-12, -58, 24, 18);
+
+            if (customFaceImg) {
+                // 若有上傳照片，將照片裁切在頭像圓框中
+                ctx.save();
+                ctx.beginPath();
+                ctx.arc(0, -76, 26, 0, Math.PI * 2);
+                ctx.closePath();
+                ctx.clip();
+                ctx.drawImage(customFaceImg, -26, -102, 52, 52);
+                ctx.restore();
+
+                ctx.strokeStyle = '#facc15';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.arc(0, -76, 26, 0, Math.PI * 2);
+                ctx.stroke();
+            } else {
+                // 預設G肉男帥氣台客頭
+                ctx.fillStyle = skinColor;
+                ctx.beginPath();
+                ctx.roundRect(-22, -98, 44, 44, 14);
+                ctx.fill();
+                ctx.strokeStyle = '#0f172a';
+                ctx.lineWidth = 2.5;
+                ctx.stroke();
+
+                // 台客飛機頭/平頭
+                ctx.fillStyle = '#0f172a';
+                ctx.beginPath();
+                ctx.moveTo(-24, -88);
+                ctx.lineTo(28, -98);
+                ctx.lineTo(22, -106);
+                ctx.lineTo(-22, -102);
+                ctx.closePath();
+                ctx.fill();
+
+                // 表情切換
+                if (expression === 'SWEAT') {
+                    // 垂下來時的無奈冒汗表情
+                    ctx.strokeStyle = '#0f172a';
+                    ctx.lineWidth = 2.5;
+                    ctx.beginPath();
+                    ctx.moveTo(-14, -82); ctx.lineTo(-4, -78);
+                    ctx.moveTo(14, -82); ctx.lineTo(4, -78);
+                    ctx.stroke();
+                    // 嘴角下垂
+                    ctx.beginPath();
+                    ctx.arc(0, -64, 7, Math.PI * 1.15, Math.PI * 1.85);
+                    ctx.stroke();
+                    // 大滴冷汗
+                    ctx.fillStyle = '#38bdf8';
+                    ctx.beginPath();
+                    ctx.arc(25, -84, 5, 0, Math.PI * 2);
+                    ctx.fill();
+                } else {
+                    // 自信墨鏡 + 歪嘴笑
+                    ctx.fillStyle = '#090d16';
+                    ctx.fillRect(-18, -86, 16, 10);
+                    ctx.fillRect(4, -86, 16, 10);
+                    ctx.fillRect(-2, -84, 6, 3);
+                    // 墨鏡反光
+                    ctx.fillStyle = '#38bdf8';
+                    ctx.fillRect(-15, -84, 5, 3);
+                    ctx.fillRect(7, -84, 5, 3);
+
+                    // 自信笑容
+                    ctx.strokeStyle = '#0f172a';
+                    ctx.lineWidth = 2.5;
+                    ctx.beginPath();
+                    ctx.arc(2, -68, 8, 0.1, Math.PI * 0.85);
+                    ctx.stroke();
+                }
+            }
+
+            // 前方揮棒手臂 + 傳奇大棒子
+            ctx.save();
+            ctx.translate(36, -28);
+            ctx.rotate((swingAngle * Math.PI) / 180);
+
+            // 巨型手臂肌肉
+            ctx.fillStyle = skinColor;
+            ctx.beginPath();
+            ctx.arc(8, 8, 17, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = '#0f172a';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // 手拿的大棒子 (在大凶垂下時會彎曲下垂)
+            if (expression === 'SWEAT' && state.bird.state === 'DROOP_GROUND') {
+                // 軟掉下垂的棒子
+                ctx.fillStyle = '#d97706';
+                ctx.beginPath();
+                ctx.moveTo(14, 12);
+                ctx.quadraticCurveTo(40, 25, 36, 58);
+                ctx.lineTo(24, 58);
+                ctx.quadraticCurveTo(25, 30, 8, 18);
+                ctx.closePath();
+                ctx.fill();
+                ctx.stroke();
+            } else {
+                // 威猛金黃球棒
+                ctx.fillStyle = '#f59e0b';
+                ctx.beginPath();
+                ctx.roundRect(10, -52, 14, 68, 7);
+                ctx.fill();
+                ctx.strokeStyle = '#78350f';
+                ctx.lineWidth = 2.5;
+                ctx.stroke();
+                // 棒頭高光
+                ctx.fillStyle = '#fde047';
+                ctx.fillRect(13, -48, 4, 35);
+            }
+
+            ctx.restore();
+            ctx.restore();
+        }
+
+        // 繪製轉角小鳥
+        function drawCornerBird(ctx, bird, tick) {
+            if (!bird.visible) return;
+            ctx.save();
+            ctx.translate(bird.x, bird.y);
+            ctx.rotate(bird.rotation);
+
+            // 小鳥身體 (圓滾滾搞笑小鳥)
+            const isDrooped = bird.state === 'DROOP_GROUND';
+            ctx.fillStyle = isDrooped ? '#94a3b8' : '#38bdf8';
+            ctx.beginPath();
+            if (isDrooped) {
+                // 垂下來扁掉的形狀
+                ctx.ellipse(0, 6, 24, 11, 0, 0, Math.PI * 2);
+            } else {
+                ctx.ellipse(0, 0, 19, 16, 0, 0, Math.PI * 2);
+            }
+            ctx.fill();
+            ctx.strokeStyle = '#0f172a';
+            ctx.lineWidth = 2.5;
+            ctx.stroke();
+
+            // 翅膀拍動
+            const wingY = isDrooped ? 8 : Math.sin(tick * 0.35) * 6;
+            ctx.fillStyle = isDrooped ? '#64748b' : '#0284c7';
+            ctx.beginPath();
+            ctx.ellipse(-4, wingY, 10, 6, -0.2, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+
+            // 鳥嘴
+            ctx.fillStyle = '#facc15';
+            ctx.beginPath();
+            ctx.moveTo(-18, -3);
+            ctx.lineTo(-30, 1);
+            ctx.lineTo(-18, 6);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+
+            // 眼睛
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.arc(-10, -4, 5, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#0f172a';
+            if (bird.dizzyStars || isDrooped) {
+                // 暈眩 XX 眼
+                ctx.font = '900 11px sans-serif';
+                ctx.fillText('X', -14, 0);
+            } else {
+                ctx.beginPath();
+                ctx.arc(-11, -4, 2.5, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            // 命中街角時的頭頂旋轉星星
+            if (bird.dizzyStars) {
+                for (let i = 0; i < 3; i++) {
+                    const angle = tick * 0.15 + (i * Math.PI * 2) / 3;
+                    const sx = Math.cos(angle) * 22;
+                    const sy = -22 + Math.sin(angle) * 6;
+                    ctx.fillStyle = '#facc15';
+                    ctx.font = '14px sans-serif';
+                    ctx.fillText('★', sx - 6, sy);
+                }
+            }
+
+            ctx.restore();
+        }
+
+        /* ----------------------------------------------------------
+         * 5. 階段一預覽動畫迴圈與階段二主遊戲畫布迴圈
+         * ---------------------------------------------------------- */
+        const setupCanvas = document.getElementById('setup-preview-canvas');
+        const setupCtx = setupCanvas.getContext('2d');
+        const gameCanvas = document.getElementById('game-canvas');
+        const gameCtx = gameCanvas.getContext('2d');
+
+        function resizeGameCanvas() {
+            const wrapper = document.getElementById('canvas-wrapper');
+            if (!wrapper) return;
+            const rect = wrapper.getBoundingClientRect();
+            if (rect.width > 0 && rect.height > 0) {
+                gameCanvas.width = 800;
+                gameCanvas.height = 450;
+            }
+        }
+        window.addEventListener('resize', resizeGameCanvas);
+
+        function renderSetupPreview() {
+            setupCtx.clearRect(0, 0, setupCanvas.width, setupCanvas.height);
+
+            // 背景光環
+            const grad = setupCtx.createRadialGradient(120, 140, 15, 120, 140, 110);
+            grad.addColorStop(0, 'rgba(250, 204, 21, 0.28)');
+            grad.addColorStop(1, 'rgba(15, 23, 42, 0)');
+            setupCtx.fillStyle = grad;
+            setupCtx.fillRect(0, 0, setupCanvas.width, setupCanvas.height);
+
+            const swingPreview = Math.sin(state.animTick * 0.08) * 15;
+            drawMuscleMan(setupCtx, 115, 165, 1.05, state.animTick, swingPreview, 'NORMAL');
+        }
+
+        /* ----------------------------------------------------------
+         * 6. 遊戲主流程控制 (Stage 2: 街頭漫遊與轉角打鳥)
+         * ---------------------------------------------------------- */
+        function startGame() {
+            playSfx('click');
+            document.getElementById('screen-setup').classList.add('hidden');
+            document.getElementById('screen-victory').classList.add('hidden');
+            const gameScreen = document.getElementById('screen-game');
+            gameScreen.classList.remove('hidden');
+            gameScreen.classList.add('flex');
+
+            resizeGameCanvas();
+
+            state.currentLevelIdx = 0;
+            state.cornerIndex = 0;
+            state.score = 0;
+            state.stats = { tier1: 0, tier2: 0, tier3: 0 };
+            startLevel(0);
+        }
+
+        function resetToSetup() {
+            playSfx('click');
+            document.getElementById('screen-game').classList.add('hidden');
+            document.getElementById('screen-game').classList.remove('flex');
+            document.getElementById('screen-victory').classList.add('hidden');
+            document.getElementById('screen-setup').classList.remove('hidden');
+        }
+
+        function startLevel(levelIdx) {
+            state.currentLevelIdx = levelIdx;
+            state.cornerIndex = 0;
+            state.scooters = [
+                { x: 850, y: 365, speed: 5.5, color: '#ef4444' },
+                { x: 1250, y: 382, speed: 6.8, color: '#3b82f6' }
+            ];
+            updateHUD();
+            beginWandering();
+        }
+
+        function updateHUD() {
+            const lvl = LEVELS[state.currentLevelIdx];
+            document.getElementById('hud-level-title').textContent = lvl.shortName;
+            document.getElementById('hud-score').textContent = state.score;
+
+            const dotsContainer = document.getElementById('hud-corner-dots');
+            dotsContainer.innerHTML = '';
+            for (let i = 0; i < lvl.cornersRequired; i++) {
+                const dot = document.createElement('span');
+                if (i < state.cornerIndex) {
+                    dot.className = 'w-5 h-5 rounded-full bg-emerald-400 text-slate-950 font-black text-xs flex items-center justify-center shadow';
+                    dot.textContent = '✓';
+                } else if (i === state.cornerIndex) {
+                    dot.className = 'w-5 h-5 rounded-full bg-yellow-400 text-slate-950 font-black text-xs flex items-center justify-center animate-pulse';
+                    dot.textContent = i + 1;
+                } else {
+                    dot.className = 'w-5 h-5 rounded-full bg-slate-700 text-slate-400 font-bold text-xs flex items-center justify-center';
+                    dot.textContent = i + 1;
+                }
+                dotsContainer.appendChild(dot);
+            }
+        }
+
+        function setControlPanel(panelId) {
+            ['ctrl-wandering', 'ctrl-corner-choice', 'ctrl-swing-now', 'ctrl-result'].forEach(id => {
+                const el = document.getElementById(id);
+                el.classList.add('hidden');
+                el.classList.remove('flex');
+            });
+            const target = document.getElementById(panelId);
+            target.classList.remove('hidden');
+            target.classList.add('flex');
+        }
+
+        function beginWandering() {
+            state.phase = 'WANDERING';
+            state.playerExpression = 'NORMAL';
+            state.swingAngle = 0;
+            state.bird.visible = false;
+            state.floatingText = null;
+            document.getElementById('power-bar-modal').classList.add('hidden');
+            document.getElementById('power-bar-modal').classList.remove('flex');
+
+            const lvl = LEVELS[state.currentLevelIdx];
+            document.getElementById('level-banner').textContent = `🚶 ${lvl.name} • 街頭漫遊中...`;
+            setControlPanel('ctrl-wandering');
+
+            // 設定走一段距離後抵達街角
+            state.walkRemainTicks = 95;
+        }
+
+        function skipToCorner() {
+            if (state.phase === 'WANDERING') {
+                state.walkRemainTicks = 2;
+                playSfx('click');
+            }
+        }
+
+        function arriveAtCorner() {
+            state.phase = 'AT_CORNER';
+            playSfx('corner');
+            const lvl = LEVELS[state.currentLevelIdx];
+
+            // 生成轉角小鳥
+            state.bird = {
+                visible: true,
+                x: 420,
+                y: 235,
+                baseY: 235,
+                vx: 0,
+                vy: 0,
+                rotation: 0,
+                state: 'IDLE',
+                dizzyStars: false
+            };
+
+            document.getElementById('level-banner').textContent = `⚠️ 抵達街角 (${state.cornerIndex + 1}/${lvl.cornersRequired})！發現野生小鳥！`;
+            const cornerTexts = [
+                '這隻小鳥停在紅磚巷口檳榔攤旁，看起來相當囂張！',
+                '十字路口紅燈剛亮，小鳥正在電線桿下挑釁你的大棒子！',
+                '嘉義神祕大道的終極鳥王現身！牠正在高速閃躲！'
+            ];
+            document.getElementById('corner-desc-text').textContent = cornerTexts[state.currentLevelIdx];
+            setControlPanel('ctrl-corner-choice');
+        }
+
+        // 玩家選擇「放過轉彎繼續走」
+        function passCorner() {
+            playSfx('click');
+            state.score += 50;
+            state.floatingText = {
+                text: '🕊️ 和平放過轉彎 +50分',
+                color: '#38bdf8',
+                y: 150,
+                alpha: 1.0
+            };
+            completeCurrentCorner();
+        }
+
+        // 玩家選擇「拿棒子打小鳥！」 -> 開啟三階集氣判定條
+        function openSwingGauge() {
+            playSfx('click');
+            state.phase = 'AIMING';
+            state.gaugePos = 10;
+            state.gaugeDir = 1;
+
+            const lvl = LEVELS[state.currentLevelIdx];
+            // 動態調整三種等級區域寬度
+            const goodW = lvl.goodZoneWidth;
+            const midLeftW = Math.floor(lvl.midZoneWidth / 2);
+            const midRightW = lvl.midZoneWidth - midLeftW;
+            const badTotal = 100 - goodW - lvl.midZoneWidth;
+            const badLeftW = Math.floor(badTotal / 2);
+            const badRightW = badTotal - badLeftW;
+
+            document.getElementById('zone-bad-left').style.width = `${badLeftW}%`;
+            document.getElementById('zone-mid-left').style.width = `${midLeftW}%`;
+            document.getElementById('zone-good').style.width = `${goodW}%`;
+            document.getElementById('zone-mid-right').style.width = `${midRightW}%`;
+            document.getElementById('zone-bad-right').style.width = `${badRightW}%`;
+
+            // 儲存判定區間供揮棒計算
+            state.zones = {
+                midStart: badLeftW,
+                goodStart: badLeftW + midLeftW,
+                goodEnd: badLeftW + midLeftW + goodW,
+                midEnd: badLeftW + midLeftW + goodW + midRightW
+            };
+
+            const tag = document.getElementById('power-difficulty-tag');
+            tag.textContent = lvl.id === 3 ? '🔥 終極鳥王閃躲中' : (lvl.id === 2 ? '⚡ 車水馬龍加速' : '🌱 初級巷弄速度');
+
+            const modal = document.getElementById('power-bar-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+
+            setControlPanel('ctrl-swing-now');
+        }
+
+        // 純靠運氣隨機揮棒
+        function luckyAutoSwing() {
+            state.gaugePos = Math.random() * 100;
+            executeSwingHit();
+        }
+
+        // 執行揮棒並判定三個等級
+        function executeSwingHit() {
+            if (state.phase !== 'AIMING') return;
+            state.phase = 'RESULT';
+
+            document.getElementById('power-bar-modal').classList.add('hidden');
+            document.getElementById('power-bar-modal').classList.remove('flex');
+
+            const pos = state.gaugePos;
+            const z = state.zones;
+            let tier = 3; // 預設大凶：垂下來掉在地上
+            if (pos >= z.goodStart && pos <= z.goodEnd) {
+                tier = 1; // 大吉：高飛遠走型
+            } else if (pos >= z.midStart && pos <= z.midEnd) {
+                tier = 2; // 平平：命中街角型
+            }
+
+            state.lastHitTier = tier;
+            triggerHitResult(tier);
+        }
+
+        function triggerHitResult(tier) {
+            const wrapper = document.getElementById('canvas-wrapper');
+            wrapper.classList.remove('shake-active');
+            void wrapper.offsetWidth;
+            wrapper.classList.add('shake-active');
+
+            const emojiEl = document.getElementById('result-emoji');
+            const titleEl = document.getElementById('result-title');
+            const descEl = document.getElementById('result-desc');
+
+            if (tier === 1) {
+                // 1. 高飛遠走型（大吉）
+                playSfx('tier1');
+                state.stats.tier1++;
+                state.score += 500;
+                state.swingAngle = -110;
+                state.playerExpression = 'PROUD';
+                state.bird.state = 'FLY_HIGH';
+                state.bird.vx = 11;
+                state.bird.vy = -10.5;
+
+                // 爆發金色星星粒子
+                spawnParticles(state.bird.x, state.bird.y, '#facc15', 22);
+
+                state.floatingText = {
+                    text: '🌟 高飛遠走型（大吉）！咻——！ +500分',
+                    color: '#facc15',
+                    y: 140,
+                    alpha: 1.0
+                };
+
+                emojiEl.textContent = '🚀';
+                titleEl.textContent = '【高飛遠走型（大吉）】+500分！';
+                titleEl.className = 'text-base sm:text-lg font-black text-yellow-300';
+                descEl.textContent = '棒子一揮，小鳥「咻——」一聲飛得又高又遠，直接消失在嘉義天際！';
+
+            } else if (tier === 2) {
+                // 2. 命中街角型（平平）
+                playSfx('tier2');
+                state.stats.tier2++;
+                state.score += 200;
+                state.swingAngle = -75;
+                state.playerExpression = 'NORMAL';
+                state.bird.state = 'HIT_CORNER';
+                state.bird.vx = 9;
+                state.bird.vy = -3;
+
+                spawnParticles(state.bird.x, state.bird.y, '#38bdf8', 14);
+
+                state.floatingText = {
+                    text: '💥 命中街角型（平平）！撞上電線桿 +200分',
+                    color: '#38bdf8',
+                    y: 145,
+                    alpha: 1.0
+                };
+
+                emojiEl.textContent = '💫';
+                titleEl.textContent = '【命中街角型（平平）】+200分';
+                titleEl.className = 'text-base sm:text-lg font-black text-sky-300';
+                descEl.textContent = '鏘！精準打在街角的電線桿上，小鳥暈頭轉向地彈回地面冒星星！';
+
+            } else {
+                // 3. 垂頭喪氣型（大凶）
+                playSfx('tier3');
+                state.stats.tier3++;
+                state.score = Math.max(0, state.score - 30);
+                state.swingAngle = 45;
+                state.playerExpression = 'SWEAT';
+                state.bird.state = 'DROOP_GROUND';
+                state.bird.vx = 0.8;
+                state.bird.vy = 7;
+
+                state.floatingText = {
+                    text: '🥀 垂頭喪氣型（大凶）...垂下來掉在地上 -30分',
+                    color: '#fb7185',
+                    y: 150,
+                    alpha: 1.0
+                };
+
+                emojiEl.textContent = '🥀';
+                titleEl.textContent = '【垂頭喪氣型（大凶）】垂下來掉在地上...';
+                titleEl.className = 'text-base sm:text-lg font-black text-rose-400';
+                descEl.textContent = '力道沒抓好！棒子與小鳥直接「啪嗒」垂下來掉在地上，G肉男露出尷尬冷汗...';
+            }
+
+            updateHUD();
+            setControlPanel('ctrl-result');
+        }
+
+        function proceedAfterHit() {
+            playSfx('click');
+            completeCurrentCorner();
+        }
+
+        function completeCurrentCorner() {
+            const lvl = LEVELS[state.currentLevelIdx];
+            state.cornerIndex++;
+            updateHUD();
+
+            if (state.cornerIndex >= lvl.cornersRequired) {
+                // 進入下一關或通關
+                if (state.currentLevelIdx + 1 < LEVELS.length) {
+                    playSfx('fanfare');
+                    startLevel(state.currentLevelIdx + 1);
+                } else {
+                    // 三關全破！進入通關結算與迷因卡畫面
+                    showVictoryScreen();
+                }
+            } else {
+                beginWandering();
+            }
+        }
+
+        // 支援鍵盤空白鍵揮棒
+        window.addEventListener('keydown', (e) => {
+            if (e.code === 'Space') {
+                if (state.phase === 'AIMING') {
+                    e.preventDefault();
+                    executeSwingHit();
+                } else if (state.phase === 'AT_CORNER') {
+                    e.preventDefault();
+                    openSwingGauge();
+                }
+            }
+        });
+
+        /* ----------------------------------------------------------
+         * 7. 台灣街頭三關場景繪製與物理特效更新
+         * ---------------------------------------------------------- */
+        function spawnParticles(x, y, color, count) {
+            for (let i = 0; i < count; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const spd = 2 + Math.random() * 6;
+                state.particles.push({
+                    x, y,
+                    vx: Math.cos(angle) * spd,
+                    vy: Math.sin(angle) * spd,
+                    size: 3 + Math.random() * 4,
+                    color,
+                    life: 1.0
+                });
+            }
+        }
+
+        function drawTaiwanStreetScene(ctx) {
+            const W = gameCanvas.width;
+            const H = gameCanvas.height;
+            const lvl = LEVELS[state.currentLevelIdx];
+
+            // 1. 天空漸層
+            const sky = ctx.createLinearGradient(0, 0, 0, H * 0.72);
+            sky.addColorStop(0, lvl.skyGrad[0]);
+            sky.addColorStop(1, lvl.skyGrad[1]);
+            ctx.fillStyle = sky;
+            ctx.fillRect(0, 0, W, H);
+
+            // 遠景城市剪影
+            ctx.fillStyle = 'rgba(15, 23, 42, 0.7)';
+            for (let i = 0; i < 9; i++) {
+                const bx = ((i * 130 - state.streetScrollX * 0.25) % (W + 150) + (W + 150)) % (W + 150) - 120;
+                const bh = 90 + (i % 3) * 40;
+                ctx.fillRect(bx, 300 - bh, 95, bh);
+            }
+
+            // 2. 根據關卡繪製台灣特色街景
+            const scrollOffset = state.streetScrollX % 400;
+
+            if (lvl.id === 1) {
+                // 第 1 關：初級巷弄（紅磚牆 + 檳榔攤霓虹燈）
+                for (let x = -scrollOffset; x < W + 400; x += 400) {
+                    // 紅磚巷牆
+                    ctx.fillStyle = '#7f1d1d';
+                    ctx.fillRect(x, 165, 360, 145);
+                    ctx.strokeStyle = '#450a0a';
+                    ctx.lineWidth = 2;
+                    for (let row = 0; row < 5; row++) {
+                        ctx.beginPath();
+                        ctx.moveTo(x, 165 + row * 28);
+                        ctx.lineTo(x + 360, 165 + row * 28);
+                        ctx.stroke();
+                    }
+
+                    // 檳榔攤透明玻璃屋與七彩霓虹招牌
+                    ctx.fillStyle = '#064e3b';
+                    ctx.fillRect(x + 190, 185, 125, 120);
+                    ctx.strokeStyle = '#10b981';
+                    ctx.lineWidth = 4;
+                    ctx.strokeRect(x + 190, 185, 125, 120);
+
+                    // 閃爍孔雀燈
+                    const flash = Math.floor(state.animTick / 12) % 2 === 0;
+                    ctx.fillStyle = flash ? '#ec4899' : '#22c55e';
+                    ctx.fillRect(x + 200, 145, 105, 34);
+                    ctx.fillStyle = '#ffffff';
+                    ctx.font = '900 18px "Noto Sans TC"';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('雙冬檳榔', x + 252, 168);
+                }
+            } else if (lvl.id === 2) {
+                // 第 2 關：市區十字路口（斑馬線、紅綠燈、飲料店招牌）
+                for (let x = -scrollOffset; x < W + 400; x += 400) {
+                    ctx.fillStyle = '#1e293b';
+                    ctx.fillRect(x + 20, 120, 160, 190);
+                    ctx.fillStyle = '#0284c7';
+                    ctx.fillRect(x + 35, 140, 130, 42);
+                    ctx.fillStyle = '#fef08a';
+                    ctx.font = '900 18px "Noto Sans TC"';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('純喫茶冷飲', x + 100, 167);
+
+                    // 紅綠燈號誌桿
+                    ctx.fillStyle = '#475569';
+                    ctx.fillRect(x + 260, 110, 10, 200);
+                    ctx.fillStyle = '#0f172a';
+                    ctx.fillRect(x + 240, 110, 68, 26);
+                    ctx.fillStyle = '#ef4444';
+                    ctx.beginPath(); ctx.arc(x + 254, 123, 7, 0, Math.PI * 2); ctx.fill();
+                    ctx.fillStyle = '#eab308';
+                    ctx.beginPath(); ctx.arc(x + 274, 123, 7, 0, Math.PI * 2); ctx.fill();
+                    ctx.fillStyle = '#22c55e';
+                    ctx.beginPath(); ctx.arc(x + 294, 123, 7, 0, Math.PI * 2); ctx.fill();
+                }
+            } else {
+                // 第 3 關：嘉義神祕大道（巨型正宗火雞肉飯霓虹招牌 + 噴水池圓環感）
+                for (let x = -scrollOffset; x < W + 400; x += 400) {
+                    // 巨型火雞肉飯黃金招牌
+                    ctx.fillStyle = '#991b1b';
+                    ctx.fillRect(x + 30, 95, 290, 80);
+                    ctx.strokeStyle = '#facc15';
+                    ctx.lineWidth = 5;
+                    ctx.strokeRect(x + 30, 95, 290, 80);
+
+                    ctx.fillStyle = '#fde047';
+                    ctx.font = '900 28px "Noto Sans TC"';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('🍗 嘉義正宗火雞肉飯', x + 175, 145);
+
+                    // 店面鐵捲門與紅燈籠
+                    ctx.fillStyle = '#334155';
+                    ctx.fillRect(x + 55, 175, 240, 130);
+                    ctx.fillStyle = '#ef4444';
+                    ctx.beginPath(); ctx.arc(x + 80, 195, 14, 0, Math.PI * 2); ctx.fill();
+                    ctx.beginPath(); ctx.arc(x + 270, 195, 14, 0, Math.PI * 2); ctx.fill();
+                }
+            }
+
+            // 3. 柏油馬路與人行道紅磚
+            ctx.fillStyle = '#334155';
+            ctx.fillRect(0, 305, W, 30);
+            ctx.fillStyle = '#1e293b';
+            ctx.fillRect(0, 335, W, 115);
+
+            // 斑馬線/道路雙黃線
+            ctx.fillStyle = '#facc15';
+            for (let x = -(state.streetScrollX % 120); x < W; x += 120) {
+                ctx.fillRect(x, 385, 65, 8);
+            }
+
+            // 第 2、3 關背景呼嘯而過的台灣機車陣
+            if (lvl.id >= 2) {
+                state.scooters.forEach(sc => {
+                    sc.x -= sc.speed;
+                    if (sc.x < -120) sc.x = W + 200 + Math.random() * 300;
+                    ctx.save();
+                    ctx.translate(sc.x, sc.y);
+                    // 機車車身
+                    ctx.fillStyle = sc.color;
+                    ctx.beginPath();
+                    ctx.roundRect(0, -18, 46, 18, 6);
+                    ctx.fill();
+                    // 輪胎
+                    ctx.fillStyle = '#0f172a';
+                    ctx.beginPath(); ctx.arc(10, 2, 8, 0, Math.PI * 2); ctx.fill();
+                    ctx.beginPath(); ctx.arc(38, 2, 8, 0, Math.PI * 2); ctx.fill();
+                    // 安全帽騎士
+                    ctx.fillStyle = '#fde047';
+                    ctx.beginPath(); ctx.arc(24, -28, 9, 0, Math.PI * 2); ctx.fill();
+                    ctx.restore();
+                });
+            }
+
+            // 4. 街角電線桿 (當遇到轉角時出現在畫面右側)
+            if (state.phase !== 'WANDERING') {
+                const poleX = 560;
+                // 電線桿本體
+                ctx.fillStyle = '#64748b';
+                ctx.fillRect(poleX, 60, 24, 265);
+                // 黃黑警示斜紋
+                ctx.fillStyle = '#facc15';
+                for (let py = 210; py < 305; py += 24) {
+                    ctx.fillRect(poleX, py, 24, 12);
+                }
+                // 街角路牌
+                ctx.fillStyle = '#15803d';
+                ctx.fillRect(poleX - 75, 95, 95, 28);
+                ctx.strokeStyle = '#ffffff';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(poleX - 75, 95, 95, 28);
+                ctx.fillStyle = '#ffffff';
+                ctx.font = 'bold 13px "Noto Sans TC"';
+                ctx.textAlign = 'center';
+                ctx.fillText('嘉義棒鳥街角', poleX - 28, 114);
+            }
+        }
+
+        function updateAndRenderGame() {
+            state.animTick++;
+
+            // 階段一預覽同步更新
+            if (!document.getElementById('screen-setup').classList.contains('hidden')) {
+                renderSetupPreview();
+            }
+
+            // 若在階段二遊戲畫面中
+            if (!document.getElementById('screen-game').classList.contains('hidden')) {
+                const lvl = LEVELS[state.currentLevelIdx];
+
+                // A. 漫遊捲動邏輯
+                if (state.phase === 'WANDERING') {
+                    state.streetScrollX += lvl.walkSpeed * 2.2;
+                    state.walkRemainTicks--;
+                    if (state.walkRemainTicks <= 0) {
+                        arriveAtCorner();
+                    }
+                }
+
+                // B. 集氣條游標來回移動 + 第三關鳥王閃躲
+                if (state.phase === 'AIMING') {
+                    state.gaugePos += state.gaugeDir * lvl.gaugeSpeed;
+                    if (state.gaugePos >= 98) {
+                        state.gaugePos = 98;
+                        state.gaugeDir = -1;
+                    } else if (state.gaugePos <= 2) {
+                        state.gaugePos = 2;
+                        state.gaugeDir = 1;
+                    }
+                    document.getElementById('power-cursor').style.left = `${state.gaugePos}%`;
+
+                    if (lvl.birdDodge) {
+                        state.bird.y = state.bird.baseY + Math.sin(state.animTick * 0.22) * 38;
+                    }
+                }
+
+                // C. 小鳥被打後的三大物理軌跡
+                if (state.bird.visible) {
+                    if (state.bird.state === 'IDLE' && state.phase === 'AT_CORNER') {
+                        state.bird.y = state.bird.baseY + Math.sin(state.animTick * 0.12) * 8;
+                    } else if (state.bird.state === 'FLY_HIGH') {
+                        // 高飛遠走型：又高又遠飛向天際
+                        state.bird.x += state.bird.vx;
+                        state.bird.y += state.bird.vy;
+                        state.bird.rotation += 0.25;
+                        if (state.animTick % 2 === 0) {
+                            spawnParticles(state.bird.x, state.bird.y, '#fde047', 1);
+                        }
+                    } else if (state.bird.state === 'HIT_CORNER') {
+                        // 命中街角型：撞上 x=560 的電線桿後反彈落地冒星星
+                        state.bird.x += state.bird.vx;
+                        state.bird.y += state.bird.vy;
+                        state.bird.vy += 0.45; // 重力
+                        if (state.bird.x >= 545 && state.bird.vx > 0) {
+                            state.bird.vx = -4.5;
+                            state.bird.vy = -4;
+                            state.bird.dizzyStars = true;
+                            spawnParticles(555, state.bird.y, '#ffffff', 12);
+                        }
+                        if (state.bird.y >= 315) {
+                            state.bird.y = 315;
+                            state.bird.vx *= 0.8;
+                            state.bird.vy = 0;
+                        }
+                    } else if (state.bird.state === 'DROOP_GROUND') {
+                        // 垂頭喪氣型：直接垂下來掉在地上
+                        state.bird.x += state.bird.vx;
+                        state.bird.y += state.bird.vy;
+                        state.bird.vy += 0.65;
+                        if (state.bird.y >= 325) {
+                            state.bird.y = 325;
+                            state.bird.vx = 0;
+                            state.bird.vy = 0;
+                        }
+                    }
+                }
+
+                // D. 繪製街頭場景、G肉男、小鳥與粒子
+                drawTaiwanStreetScene(gameCtx);
+
+                const walkAnim = state.phase === 'WANDERING' ? state.animTick : 0;
+                drawMuscleMan(
+                    gameCtx,
+                    230,
+                    245,
+                    1.15,
+                    walkAnim,
+                    state.swingAngle,
+                    state.playerExpression,
+                    state.uploadedPhotoImg
+                );
+
+                drawCornerBird(gameCtx, state.bird, state.animTick);
+
+                // 繪製粒子
+                for (let i = state.particles.length - 1; i >= 0; i--) {
+                    const p = state.particles[i];
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.life -= 0.03;
+                    if (p.life <= 0) {
+                        state.particles.splice(i, 1);
+                        continue;
+                    }
+                    gameCtx.save();
+                    gameCtx.globalAlpha = p.life;
+                    gameCtx.fillStyle = p.color;
+                    gameCtx.beginPath();
+                    gameCtx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                    gameCtx.fill();
+                    gameCtx.restore();
+                }
+
+                // 繪製畫面中央浮動大字報
+                if (state.floatingText) {
+                    const ft = state.floatingText;
+                    gameCtx.save();
+                    gameCtx.font = '900 26px "Noto Sans TC", sans-serif';
+                    gameCtx.textAlign = 'center';
+                    gameCtx.fillStyle = '#000000';
+                    gameCtx.fillText(ft.text, 403, ft.y + 3);
+                    gameCtx.fillStyle = ft.color;
+                    gameCtx.fillText(ft.text, 400, ft.y);
+                    gameCtx.restore();
+                }
+            }
+
+            requestAnimationFrame(updateAndRenderGame);
+        }
+
+        /* ----------------------------------------------------------
+         * 8. 階段三：通關結算、上傳照片與迷因紀念卡合成
+         * ---------------------------------------------------------- */
+        function showVictoryScreen() {
+            playSfx('fanfare');
+            document.getElementById('screen-game').classList.add('hidden');
+            document.getElementById('screen-game').classList.remove('flex');
+            document.getElementById('screen-victory').classList.remove('hidden');
+
+            document.getElementById('stat-total-score').textContent = state.score;
+            document.getElementById('stat-tier1').textContent = `${state.stats.tier1}次`;
+            document.getElementById('stat-tier2').textContent = `${state.stats.tier2}次`;
+            document.getElementById('stat-tier3').textContent = `${state.stats.tier3}次`;
+
+            renderMemeCard();
+        }
+
+        function setMemeQuote(quoteText) {
+            document.getElementById('meme-quote-input').value = quoteText;
+            playSfx('click');
+            renderMemeCard();
+        }
+
+        function handlePhotoUpload(event) {
+            const file = event.target.files && event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    state.uploadedPhotoImg = img;
+                    document.getElementById('btn-clear-photo').classList.remove('hidden');
+                    playSfx('fanfare');
+                    renderMemeCard();
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function clearUploadedPhoto() {
+            state.uploadedPhotoImg = null;
+            document.getElementById('photo-upload-input').value = '';
+            document.getElementById('btn-clear-photo').classList.add('hidden');
+            playSfx('click');
+            renderMemeCard();
+        }
+
+        function renderMemeCard() {
+            const canvas = document.getElementById('meme-card-canvas');
+            const ctx = canvas.getContext('2d');
+            const W = canvas.width;
+            const H = canvas.height;
+
+            // 1. 炫彩台味街頭背景
+            const bgGrad = ctx.createLinearGradient(0, 0, 0, H);
+            bgGrad.addColorStop(0, '#1e1b4b');
+            bgGrad.addColorStop(0.5, '#4c0519');
+            bgGrad.addColorStop(1, '#090d16');
+            ctx.fillStyle = bgGrad;
+            ctx.fillRect(0, 0, W, H);
+
+            // 放射光芒線條
+            ctx.save();
+            ctx.translate(W / 2, 330);
+            ctx.fillStyle = 'rgba(250, 204, 21, 0.08)';
+            for (let i = 0; i < 16; i++) {
+                ctx.rotate((Math.PI * 2) / 16);
+                ctx.beginPath();
+                ctx.moveTo(0, 0);
+                ctx.lineTo(-35, -500);
+                ctx.lineTo(35, -500);
+                ctx.closePath();
+                ctx.fill();
+            }
+            ctx.restore();
+
+            // 2. 金色雙層外框
+            ctx.strokeStyle = '#facc15';
+            ctx.lineWidth = 10;
+            ctx.strokeRect(18, 18, W - 36, H - 36);
+            ctx.strokeStyle = '#f59e0b';
+            ctx.lineWidth = 3;
+            ctx.strokeRect(30, 30, W - 60, H - 60);
+
+            // 3. 頂部招牌橫幅
+            ctx.fillStyle = '#991b1b';
+            ctx.fillRect(55, 48, W - 110, 70);
+            ctx.strokeStyle = '#fde047';
+            ctx.lineWidth = 4;
+            ctx.strokeRect(55, 48, W - 110, 70);
+
+            ctx.fillStyle = '#fde047';
+            ctx.font = '900 32px "Noto Sans TC", sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('★ 嘉義街頭棒鳥榮譽證書 ★', W / 2, 94);
+
+            // 4. 繪製主角G肉男 (穿著玩家自選背心顏色與號碼 + 上傳照片頭像)
+            drawMuscleMan(ctx, 235, 385, 1.85, 0, -55, 'PROUD', state.uploadedPhotoImg);
+
+            // 若有上傳照片，也在右上角附上圓形寫真大頭貼徽章
+            if (state.uploadedPhotoImg) {
+                ctx.save();
+                ctx.beginPath();
+                ctx.arc(465, 225, 68, 0, Math.PI * 2);
+                ctx.closePath();
+                ctx.clip();
+                ctx.drawImage(state.uploadedPhotoImg, 397, 157, 136, 136);
+                ctx.restore();
+
+                ctx.strokeStyle = '#facc15';
+                ctx.lineWidth = 5;
+                ctx.beginPath();
+                ctx.arc(465, 225, 68, 0, Math.PI * 2);
+                ctx.stroke();
+
+                ctx.fillStyle = '#facc15';
+                ctx.font = '900 16px "Noto Sans TC"';
+                ctx.textAlign = 'center';
+                ctx.fillText('本人親征認證', 465, 315);
+            } else {
+                // 繪製被打飛在空中的搞笑小鳥
+                const dummyBird = {
+                    visible: true,
+                    x: 455,
+                    y: 235,
+                    rotation: -0.45,
+                    state: 'FLY_HIGH',
+                    dizzyStars: true
+                };
+                drawCornerBird(ctx, dummyBird, 12);
+                ctx.fillStyle = '#fde047';
+                ctx.font = '900 22px "Noto Sans TC"';
+                ctx.textAlign = 'center';
+                ctx.fillText('咻——！高飛遠走！', 450, 305);
+            }
+
+            // 5. 玩家輸入的傳奇名言（預設：嘉義棒鳥G肉男）
+            const quote = (document.getElementById('meme-quote-input').value || '嘉義棒鳥G肉男').trim();
+
+            ctx.fillStyle = 'rgba(15, 23, 42, 0.9)';
+            ctx.fillRect(48, 535, W - 96, 95);
+            ctx.strokeStyle = '#facc15';
+            ctx.lineWidth = 3;
+            ctx.strokeRect(48, 535, W - 96, 95);
+
+            ctx.fillStyle = '#94a3b8';
+            ctx.font = 'bold 16px "Noto Sans TC"';
+            ctx.textAlign = 'center';
+            ctx.fillText('— 街頭傳奇名言 —', W / 2, 562);
+
+            ctx.fillStyle = '#facc15';
+            ctx.font = '900 36px "Noto Sans TC", sans-serif';
+            ctx.fillText(`「${quote}」`, W / 2, 608);
+
+            // 6. 底部戰績與背心資訊
+            ctx.fillStyle = '#e2e8f0';
+            ctx.font = 'bold 18px "Noto Sans TC"';
+            ctx.fillText(
+                `戰袍：${state.vestColorName} #${state.vestNumber}號  |  總積分：${state.score}分`,
+                W / 2,
+                668
+            );
+
+            ctx.fillStyle = '#38bdf8';
+            ctx.font = 'bold 16px "Noto Sans TC"';
+            ctx.fillText(
+                `高飛(大吉): ${state.stats.tier1}  •  街角(平平): ${state.stats.tier2}  •  垂下(大凶): ${state.stats.tier3}`,
+                W / 2,
+                700
+            );
+        }
+
+        function downloadMemeCard() {
+            playSfx('click');
+            const canvas = document.getElementById('meme-card-canvas');
+            const link = document.createElement('a');
+            link.download = `嘉義棒鳥G肉男_${state.vestNumber}號紀念卡.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+
+        /* ----------------------------------------------------------
+         * 9. 啟動初始化
+         * ---------------------------------------------------------- */
+        window.onload = function() {
+            initSetupScreen();
+            updatePreviewBadge();
+            resizeGameCanvas();
+            requestAnimationFrame(updateAndRenderGame);
+        };
+    </script>
+</body>
+</html>
